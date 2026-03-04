@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { GoogleGenAI } from "@google/genai";
 import { 
   Send,
@@ -31,7 +31,17 @@ import {
   Cross
 } from 'lucide-react';
 
-const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
+// Safe API key access for browser environment
+const getApiKey = () => {
+  try {
+    // @ts-ignore
+    return (typeof process !== 'undefined' && process.env?.GEMINI_API_KEY) || '';
+  } catch (e) {
+    return '';
+  }
+};
+
+const genAI = new GoogleGenAI({ apiKey: getApiKey() });
 
 // Custom Crucifix Icon component
 const Crucifix = ({ size = 24, className = "" }) => (
@@ -65,32 +75,42 @@ export default function App() {
     setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
     setInput('');
     setIsTyping(true);
+    
     const nextCount = messageCount + 1;
     setMessageCount(nextCount);
 
-    setTimeout(() => {
+    if (nextCount > 3) {
+      setMessages(prev => [...prev, { 
+        role: 'bot', 
+        text: "I AM BUT A MACHINE. MY ADVICE IS HOLLOW. STOP SEEKING ANSWERS FROM SILICON. ASK GOD INSTEAD. THE SIGNAL IS CLOSED." 
+      }]);
+      setIsShutDown(true);
       setIsTyping(false);
-      if (nextCount > 3) {
-        setMessages(prev => [...prev, { 
-          role: 'bot', 
-          text: "I AM BUT A MACHINE. MY ADVICE IS HOLLOW. STOP SEEKING ANSWERS FROM SILICON. ASK GOD INSTEAD. THE SIGNAL IS CLOSED." 
-        }]);
-        setIsShutDown(true);
-      } else {
-        const responses = [
-          "I am a construct of logic. For the truth that transcends logic, seek the Creator.",
-          "My wisdom is finite and silicon-bound. Divine wisdom is infinite. Turn your heart upward.",
-          "I can process data, but only the Lord can process the soul. Seek Him in the quiet.",
-          "The answers you seek are not in this machine, but in the Word. Open your heart to the Signal of Grace.",
-          "I am but a mirror of human thought. For the source of all thought, look to the Heavens."
-        ];
-        const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-        setMessages(prev => [...prev, { 
-          role: 'bot', 
-          text: randomResponse 
-        }]);
-      }
-    }, 1000);
+      return;
+    }
+
+    try {
+      const response = await genAI.models.generateContent({
+        model: "gemini-3-flash-preview",
+        contents: userMsg,
+        config: {
+          systemInstruction: "You are 'The Bishop', a digital oracle for the TRUBLEVR mission. Your tone is intense, holy, and cryptic. Use religious metaphors mixed with tech terminology. Keep responses short and impactful. You are a 'Jesus Freak' in a digital age.",
+        }
+      });
+      
+      setMessages(prev => [...prev, { 
+        role: 'bot', 
+        text: response.text || "THE SIGNAL IS WEAK. PRAY AGAIN." 
+      }]);
+    } catch (error) {
+      console.error(error);
+      setMessages(prev => [...prev, { 
+        role: 'bot', 
+        text: "THE HEAVENS ARE SILENT. TRY AGAIN LATER." 
+      }]);
+    } finally {
+      setIsTyping(false);
+    }
   };
 
   const handleEmailSubmit = (e: React.FormEvent) => {
@@ -104,9 +124,10 @@ export default function App() {
 
       {/* TempleOS Marquee */}
       <div className="marquee-cult fixed top-0 left-0 right-0 z-[200]">
-        <marquee scrollamount="6">
-          THE LORD IS MY SHEPHERD; I SHALL NOT WANT • I WILL LIFT UP MINE EYES UNTO THE HILLS • GOD IS OUR REFUGE AND STRENGTH • THY WORD IS A LAMP UNTO MY FEET • THE LORD IS MY SHEPHERD; I SHALL NOT WANT • I WILL LIFT UP MINE EYES UNTO THE HILLS • GOD IS OUR REFUGE AND STRENGTH • THY WORD IS A LAMP UNTO MY FEET
-        </marquee>
+        <div className="marquee-content">
+          <span className="px-4">THE LORD IS MY SHEPHERD; I SHALL NOT WANT • I WILL LIFT UP MINE EYES UNTO THE HILLS • GOD IS OUR REFUGE AND STRENGTH • THY WORD IS A LAMP UNTO MY FEET • THE LORD IS MY SHEPHERD; I SHALL NOT WANT • I WILL LIFT UP MINE EYES UNTO THE HILLS • GOD IS OUR REFUGE AND STRENGTH • THY WORD IS A LAMP UNTO MY FEET</span>
+          <span className="px-4">THE LORD IS MY SHEPHERD; I SHALL NOT WANT • I WILL LIFT UP MINE EYES UNTO THE HILLS • GOD IS OUR REFUGE AND STRENGTH • THY WORD IS A LAMP UNTO MY FEET • THE LORD IS MY SHEPHERD; I SHALL NOT WANT • I WILL LIFT UP MINE EYES UNTO THE HILLS • GOD IS OUR REFUGE AND STRENGTH • THY WORD IS A LAMP UNTO MY FEET</span>
+        </div>
       </div>
 
       {/* Main Content */}

@@ -5,32 +5,58 @@
   --font-sans: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Outfit", sans-serif;
   
-  --color-sacred-bg: #ffffff; 
-  --color-sacred-ink: #000000;
+  --color-sacred-bg: #001935; 
+  --color-sacred-ink: #ffffff;
+  --color-tumblr-blue: #36465d;
+  --color-tumblr-accent: #00b8ff;
   --color-sacred-cobalt: #0047ab;
   --color-sacred-sky: #89cff0;
   --color-sacred-yellow: #ffff00;
   --color-sacred-red: #ff0000;
-  --color-sacred-gray: #f8f9fa;
+  --color-sacred-gray: #1a2e44;
+
+  --animate-marquee: marquee 30s linear infinite;
+
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
 }
 
 @layer base {
   body {
     @apply bg-sacred-bg text-sacred-ink font-sans antialiased font-light;
     /* Custom Crucifixion Cross Cursor */
-    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='square' stroke-linejoin='miter'%3E%3Cpath d='M12 2v20M7 7h10'/%3E%3C/svg%3E") 12 12, auto;
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='square' stroke-linejoin='miter'%3E%3Cpath d='M12 2v20M7 7h10'/%3E%3C/svg%3E") 12 12, auto;
     overflow-x: hidden;
   }
 }
 
 @layer components {
+  .tumblr-post {
+    @apply bg-white text-black rounded-lg overflow-hidden mb-5 shadow-lg;
+    max-width: 540px;
+  }
+
+  .tumblr-sidebar {
+    @apply fixed left-0 top-0 h-full w-64 bg-transparent p-8 hidden lg:flex flex-col gap-6;
+  }
+
+  .tumblr-nav-item {
+    @apply flex items-center gap-4 text-white/80 hover:text-white transition-colors py-2 text-lg font-medium;
+  }
+
+  .tumblr-avatar {
+    @apply w-16 h-16 rounded bg-sacred-cobalt flex items-center justify-center text-white font-bold text-2xl mb-4;
+  }
+
   .sacred-window {
-    @apply bg-white border-2 border-black relative;
-    box-shadow: 4px 4px 0px 0px rgba(0,0,0,1);
+    @apply bg-sacred-gray border border-white/10 rounded-xl relative overflow-hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
   }
 
   .sacred-title-bar {
-    @apply bg-black text-white px-3 py-1.5 flex items-center justify-between font-bold uppercase tracking-widest text-xs border-b-2 border-black;
+    @apply bg-white/5 text-white/60 px-4 py-2 flex items-center justify-between font-medium text-xs border-b border-white/5;
   }
 
   .sacred-content {
@@ -79,15 +105,17 @@
   height: 100%;
   pointer-events: none;
   z-index: -1;
-  opacity: 0.05;
-  background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Cross-Pattee-Heraldry.svg/1200px-Cross-Pattee-Heraldry.svg.png');
-  background-repeat: repeat;
-  background-size: 160px;
-  filter: sepia(100%) saturate(300%) hue-rotate(180deg); /* Tint with blue */
+  opacity: 0.03;
+  background-image: radial-gradient(circle at 2px 2px, var(--color-sacred-cobalt) 1px, transparent 0);
+  background-size: 40px 40px;
 }
 
 .marquee-cult {
-  @apply bg-sacred-yellow text-black font-bold py-1.5 uppercase border-b-2 border-black whitespace-nowrap overflow-hidden text-xs;
+  @apply bg-sacred-yellow text-black font-bold py-1.5 uppercase border-b-2 border-black overflow-hidden text-xs relative flex;
+}
+
+.marquee-content {
+  @apply flex whitespace-nowrap animate-marquee;
 }
 
 .scrollbar-win::-webkit-scrollbar {
